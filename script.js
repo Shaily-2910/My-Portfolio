@@ -42,6 +42,42 @@
         }, 2800);
     }
 
+    // ---------- THEME (DARK / LIGHT) ----------
+    const THEME_KEY = "portfolio-theme";
+    const themeToggle = document.getElementById("theme-toggle");
+    const themeMeta = document.querySelector('meta[name="theme-color"]');
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+
+        if (themeMeta) themeMeta.setAttribute("content", theme === "dark" ? "#0b1020" : "#f6f7fb");
+
+        if (themeToggle) {
+            const isDark = theme === "dark";
+            themeToggle.setAttribute("aria-label", isDark ? "Switch to light theme" : "Switch to dark theme");
+            themeToggle.setAttribute("title", isDark ? "Switch to light theme" : "Switch to dark theme");
+            const icon = themeToggle.querySelector("i");
+            if (icon) {
+                icon.classList.toggle("fa-moon", !isDark);
+                icon.classList.toggle("fa-sun", isDark);
+            }
+        }
+    }
+
+    applyTheme(document.documentElement.getAttribute("data-theme") === "dark" ? "dark" : "light");
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", function () {
+            const next = document.documentElement.getAttribute("data-theme") === "dark" ? "light" : "dark";
+            applyTheme(next);
+            try {
+                localStorage.setItem(THEME_KEY, next);
+            } catch (e) {
+                /* storage unavailable - theme still changes for this visit */
+            }
+        });
+    }
+
     // ---------- MOBILE NAVIGATION ----------
     function setMenu(open) {
         if (!menuToggle || !navMenu) return;
@@ -187,17 +223,6 @@
             el.classList.add("visible");
         });
     }
-
-    // ---------- IMAGE FALLBACKS ----------
-    // If assets/profile.jpg is missing, show a styled "SK" placeholder
-    document.querySelectorAll(".profile-img, .about-image-box img").forEach(function (img) {
-        function applyFallback() {
-            img.style.display = "none";
-            if (img.parentElement) img.parentElement.classList.add("no-image");
-        }
-        img.addEventListener("error", applyFallback);
-        if (img.complete && img.naturalWidth === 0) applyFallback();
-    });
 
     // ---------- PLACEHOLDER LINKS ----------
     // Links still set to YOUR_... placeholders show a friendly message instead of breaking
